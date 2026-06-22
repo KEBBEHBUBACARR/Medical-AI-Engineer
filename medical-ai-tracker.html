@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Medical AI Engineer — 6-Month Tracker</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0d0f12;
+    --bg2: #141720;
+    --bg3: #1c2030;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.12);
+    --text: #e8eaf0;
+    --muted: #7a8099;
+    --accent: #5b7cff;
+    --accent2: #7b5fff;
+    --green: #3ecf8e;
+    --amber: #f5a623;
+    --red: #ff6b6b;
+    --pink: #e879a0;
+    --font: 'Inter', sans-serif;
+    --mono: 'JetBrains Mono', monospace;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font);
+    font-size: 14px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* ── Header ── */
+  .header {
+    border-bottom: 1px solid var(--border);
+    padding: 28px 24px 20px;
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 100;
+  }
+  .header-inner {
+    max-width: 1000px;
+    margin: 0 auto;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .header-title {
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--text);
+  }
+  .header-sub {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 2px;
+    font-family: var(--mono);
+  }
+  .overall-bar-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 220px;
+  }
+  .overall-bar {
+    flex: 1;
+    height: 5px;
+    background: var(--bg3);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .overall-fill {
+    height: 100%;
+    border-radius: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    transition: width 0.6s ease;
+  }
+  .overall-pct {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--accent);
+    min-width: 32px;
+    text-align: right;
+  }
+
+  /* ── Layout ── */
+  .container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 24px;
+  }
+
+  /* ── Stats row ── */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 10px;
+    margin-bottom: 28px;
+  }
+  .stat {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+  .stat-label {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 6px;
+  }
+  .stat-value {
+    font-family: var(--mono);
+    font-size: 22px;
+    font-weight: 500;
+    color: var(--text);
+  }
+  .stat-value span { font-size: 12px; color: var(--muted); }
+
+  /* ── Phase card ── */
+  .phase {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    margin-bottom: 12px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .phase:hover { border-color: var(--border2); }
+  .phase.active { border-color: rgba(91, 124, 255, 0.35); }
+
+  .phase-header {
+    padding: 16px 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    user-select: none;
+  }
+  .phase-dot {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 500;
+    flex-shrink: 0;
+    border: 1.5px solid;
+  }
+  .phase-meta { flex: 1; }
+  .phase-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .phase-sub {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+  .phase-progress-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 120px;
+  }
+  .phase-bar {
+    flex: 1;
+    height: 4px;
+    background: var(--bg3);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .phase-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.5s ease;
+  }
+  .phase-pct {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    min-width: 28px;
+    text-align: right;
+  }
+  .phase-toggle {
+    color: var(--muted);
+    font-size: 12px;
+    transition: transform 0.25s;
+  }
+  .phase-toggle.open { transform: rotate(180deg); }
+
+  /* ── Phase body ── */
+  .phase-body {
+    display: none;
+    padding: 0 20px 20px;
+    border-top: 1px solid var(--border);
+  }
+  .phase-body.open { display: block; }
+
+  .month-goal {
+    margin: 16px 0 14px;
+    padding: 12px 14px;
+    background: var(--bg3);
+    border-radius: 8px;
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.7;
+    border-left: 3px solid;
+  }
+  .month-goal strong { color: var(--text); }
+
+  /* ── Week grid ── */
+  .weeks {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .week {
+    background: var(--bg3);
+    border-radius: 10px;
+    padding: 14px;
+    border: 1px solid transparent;
+    transition: border-color 0.2s;
+  }
+  .week:hover { border-color: var(--border2); }
+  .week-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .week-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .week-status {
+    font-size: 10px;
+    padding: 2px 7px;
+    border-radius: 100px;
+    font-family: var(--mono);
+  }
+  .week-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+
+  /* ── Task items ── */
+  .task {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    padding: 5px 0;
+    cursor: pointer;
+  }
+  .task:hover .task-text { color: var(--text); }
+  .task-check {
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+    border: 1.5px solid var(--border2);
+    background: transparent;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1px;
+    transition: all 0.15s;
+  }
+  .task-check.checked {
+    border-color: var(--green);
+    background: var(--green);
+  }
+  .task-check.checked::after {
+    content: '';
+    width: 9px;
+    height: 6px;
+    border-left: 1.5px solid #0d0f12;
+    border-bottom: 1.5px solid #0d0f12;
+    transform: rotate(-45deg) translateY(-1px);
+    display: block;
+  }
+  .task-text {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.5;
+    transition: color 0.15s;
+  }
+  .task-text.done {
+    text-decoration: line-through;
+    opacity: 0.5;
+  }
+
+  /* ── Deliverable ── */
+  .deliverable {
+    border-radius: 10px;
+    padding: 14px 16px;
+    border: 1px solid;
+    margin-top: 4px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .deliverable-icon {
+    font-size: 20px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .deliverable-title {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 3px;
+  }
+  .deliverable-desc {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  /* ── Notes ── */
+  .notes-section {
+    margin-top: 14px;
+  }
+  .notes-label {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 6px;
+  }
+  .notes-input {
+    width: 100%;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 12px;
+    resize: vertical;
+    min-height: 64px;
+    outline: none;
+    transition: border-color 0.2s;
+    line-height: 1.6;
+  }
+  .notes-input:focus { border-color: var(--border2); }
+  .notes-input::placeholder { color: var(--muted); opacity: 0.6; }
+
+  /* ── Footer ── */
+  .footer {
+    text-align: center;
+    padding: 32px 24px;
+    font-size: 11px;
+    color: var(--muted);
+    font-family: var(--mono);
+    border-top: 1px solid var(--border);
+  }
+
+  /* ── Completed badge ── */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 100px;
+    font-family: var(--mono);
+  }
+
+  @media (max-width: 600px) {
+    .container { padding: 16px; }
+    .header { padding: 20px 16px 16px; }
+    .weeks { grid-template-columns: 1fr; }
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .phase-progress-wrap { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-inner">
+    <div>
+      <div class="header-title">🧬 Medical AI Engineer — 6-Month Tracker</div>
+      <div class="header-sub">Full-Stack Breast Cancer AI Platform · hobby track</div>
+    </div>
+    <div class="overall-bar-wrap">
+      <div style="font-size:11px;color:var(--muted);white-space:nowrap">Overall</div>
+      <div class="overall-bar">
+        <div class="overall-fill" id="overall-fill" style="width:0%"></div>
+      </div>
+      <div class="overall-pct" id="overall-pct">0%</div>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-label">Tasks done</div>
+      <div class="stat-value" id="stat-done">0 <span>/ 0</span></div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Weeks active</div>
+      <div class="stat-value" id="stat-weeks">0 <span>/ 24</span></div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Current phase</div>
+      <div class="stat-value" id="stat-phase">— <span></span></div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Last updated</div>
+      <div class="stat-value" id="stat-date" style="font-size:13px">—</div>
+    </div>
+  </div>
+
+  <div id="phases-container"></div>
+</div>
+
+<div class="footer">All progress saved to localStorage · refresh-safe · no account needed</div>
+
+<script>
+const PHASES = [
+  {
+    id: 1,
+    color: '#5b7cff',
+    label: 'Month 1',
+    name: 'Foundations & Medical Domain',
+    sub: 'Software engineering discipline + DICOM + medical image processing',
+    goal: '<strong>Stop thinking like a data scientist, start thinking like a software engineer.</strong> Learn DICOM, build a production-quality mammography preprocessing pipeline with full tests.',
+    weeks: [
+      {
+        id: 'w1', label: 'Week 1', title: 'Software Engineering for ML',
+        tasks: [
+          'Read: Clean Architecture chapters 1–5',
+          'Practice: SOLID principles in Python with examples',
+          'Set up: Poetry project with pyproject.toml',
+          'Build: typed Python module with pydantic models',
+          'Write: 10 pytest unit tests for your module'
+        ]
+      },
+      {
+        id: 'w2', label: 'Week 2', title: 'Medical Data Formats',
+        tasks: [
+          'Download: CBIS-DDSM mammography dataset (sample)',
+          'Read: pydicom docs + DICOM standard overview',
+          'Code: DICOM reader that extracts pixel array + metadata',
+          'Read: HL7 FHIR basics (resources, REST endpoints)',
+          'Note: HIPAA/GDPR constraints in your dev journal'
+        ]
+      },
+      {
+        id: 'w3', label: 'Week 3', title: 'Medical Image Processing I',
+        tasks: [
+          'Implement: histogram equalization (manual, then CLAHE)',
+          'Implement: Gaussian, median, bilateral filters',
+          'Implement: morphological erosion, dilation, opening, closing',
+          'Read: scikit-image and OpenCV pipeline patterns',
+          'Build: side-by-side visualization comparing all methods'
+        ]
+      },
+      {
+        id: 'w4', label: 'Week 4', title: 'Medical Image Processing II',
+        tasks: [
+          'Implement: Canny, Sobel, Laplacian edge detection',
+          'Read: image registration concepts (rigid vs deformable)',
+          'Build: full preprocessing pipeline as a typed Python class',
+          'Add: CLI interface with argparse or typer',
+          'Write: README + unit tests → push to GitHub'
+        ]
+      }
+    ],
+    deliverable: {
+      icon: '🔬',
+      title: 'Mammography Preprocessing Pipeline',
+      desc: 'CLI tool: ingest raw DICOM → CLAHE → denoise → normalize → export with metadata. Fully typed, tested, documented on GitHub.'
+    }
+  },
+  {
+    id: 2,
+    color: '#3ecf8e',
+    label: 'Month 2',
+    name: 'Medical AI Core',
+    sub: 'Deep learning for breast cancer — segmentation, classification, XAI',
+    goal: '<strong>Train research-grade models on real breast cancer data.</strong> Understand clinical metrics (sensitivity, specificity, AUC, FROC) — not just accuracy. Every experiment tracked in MLflow.',
+    weeks: [
+      {
+        id: 'w5', label: 'Week 5', title: 'Deep Learning for Medical Imaging',
+        tasks: [
+          'Read: "A Survey of Deep Learning in Breast Cancer" (Shen 2019)',
+          'Set up: PyTorch + MONAI environment',
+          'Explore: BreakHis histopathology + VinDr-Mammo datasets',
+          'Implement: transfer learning from ResNet50 on breast histology',
+          'Track: experiments in MLflow from day one'
+        ]
+      },
+      {
+        id: 'w6', label: 'Week 6', title: 'Segmentation Models',
+        tasks: [
+          'Read: "U-Net: Convolutional Networks for Biomedical Image Segmentation"',
+          'Implement: U-Net from scratch in PyTorch',
+          'Train: breast mass segmentation on CBIS-DDSM',
+          'Evaluate: Dice score, IoU, Hausdorff distance',
+          'Compare: standard U-Net vs Attention U-Net results'
+        ]
+      },
+      {
+        id: 'w7', label: 'Week 7', title: 'Classification & Detection',
+        tasks: [
+          'Read: BI-RADS scoring system documentation',
+          'Train: EfficientNet-B4 classifier (benign vs malignant)',
+          'Implement: proper train/val/test split (patient-level, not image-level)',
+          'Evaluate: ROC-AUC, sensitivity@95% specificity',
+          'Explore: YOLOv8 fine-tuning for lesion detection'
+        ]
+      },
+      {
+        id: 'w8', label: 'Week 8', title: 'Explainable AI',
+        tasks: [
+          'Implement: GradCAM and GradCAM++ from scratch',
+          'Apply: SHAP values on tabular clinical features',
+          'Build: side-by-side: original image + GradCAM overlay',
+          'Evaluate: do heatmaps align with radiologist annotations?',
+          'Package: classifier + XAI as a single inference script'
+        ]
+      }
+    ],
+    deliverable: {
+      icon: '🤖',
+      title: 'Breast Cancer Classification System',
+      desc: 'End-to-end: load histopathology → preprocess → train EfficientNet + U-Net → clinical metrics → GradCAM explanations. All experiments in MLflow on GitHub.'
+    }
+  },
+  {
+    id: 3,
+    color: '#f5a623',
+    label: 'Month 3',
+    name: 'Backend Engineering & APIs',
+    sub: 'FastAPI, PostgreSQL, Docker, clean architecture, CI/CD',
+    goal: '<strong>Build production-grade APIs a real clinical system could use.</strong> No notebooks. Everything is a module with tests, versioned in Git, containerized in Docker.',
+    weeks: [
+      {
+        id: 'w9', label: 'Week 9', title: 'FastAPI Architecture',
+        tasks: [
+          'Read: Architecture Patterns with Python (Percival) chapters 1–4',
+          'Build: FastAPI app with repository + service layer pattern',
+          'Implement: JWT authentication with role-based access (radiologist/admin)',
+          'Write: pydantic v2 schemas for DICOM study and patient data',
+          'Test: integration tests with httpx + pytest'
+        ]
+      },
+      {
+        id: 'w10', label: 'Week 10', title: 'Database Engineering',
+        tasks: [
+          'Design: PostgreSQL schema for patients, studies, predictions',
+          'Implement: SQLAlchemy 2.0 async ORM models',
+          'Write: Alembic migration with rollback strategy',
+          'Optimize: add indexes, explain analyze slow queries',
+          'Store: DICOM metadata as structured JSON columns'
+        ]
+      },
+      {
+        id: 'w11', label: 'Week 11', title: 'Containerization & CI/CD',
+        tasks: [
+          'Write: Dockerfile with multi-stage build for FastAPI service',
+          'Write: docker-compose for full local stack (API + DB + Redis)',
+          'Set up: GitHub Actions pipeline (lint → test → build → push)',
+          'Add: pre-commit hooks (ruff, mypy, black)',
+          'Document: local dev setup in README'
+        ]
+      },
+      {
+        id: 'w12', label: 'Week 12', title: 'Inference API Service',
+        tasks: [
+          'Build: /upload endpoint that accepts DICOM files',
+          'Add: async background task for inference (Celery or FastAPI background)',
+          'Return: structured JSON with predictions + GradCAM image URL',
+          'Add: Redis for job status tracking',
+          'Load test: ensure 5 concurrent inference requests work cleanly'
+        ]
+      }
+    ],
+    deliverable: {
+      icon: '⚙️',
+      title: 'Medical AI Inference API',
+      desc: 'FastAPI service: DICOM upload → async preprocessing + inference → PostgreSQL results → GradCAM URLs. Dockerized, with CI/CD pipeline on GitHub.'
+    }
+  },
+  {
+    id: 4,
+    color: '#7b5fff',
+    label: 'Month 4',
+    name: 'Data Engineering & MLOps',
+    sub: 'ETL pipelines, feature stores, model versioning, monitoring',
+    goal: '<strong>Treat your ML system like production software.</strong> Every model versioned. Every dataset has lineage. Every prediction monitored. No more "I trained it on my laptop."',
+    weeks: [
+      {
+        id: 'w13', label: 'Week 13', title: 'Data Engineering Pipelines',
+        tasks: [
+          'Set up: Apache Airflow locally with Docker',
+          'Build: DAG — ingest DICOM → validate → preprocess → store',
+          'Implement: Great Expectations data quality checks',
+          'Add: dead-letter queue for failed/corrupt DICOM files',
+          'Log: pipeline run metadata to PostgreSQL'
+        ]
+      },
+      {
+        id: 'w14', label: 'Week 14', title: 'Feature Store & Data Lake',
+        tasks: [
+          'Read: Designing ML Systems by Chip Huyen (chapters 5–7)',
+          'Design: Azure Data Lake folder structure for DICOM archives',
+          'Implement: patient-level feature aggregation (age, density, history)',
+          'Set up: Feast feature store locally',
+          'Version: datasets with DVC + remote storage (Azure Blob or S3)'
+        ]
+      },
+      {
+        id: 'w15', label: 'Week 15', title: 'MLflow & Model Registry',
+        tasks: [
+          'Migrate: all Month 2 experiments to proper MLflow tracking server',
+          'Implement: model promotion workflow (dev → staging → production)',
+          'Set up: DVC pipeline that is reproducible end-to-end',
+          'Build: A/B testing framework for two model versions',
+          'Tag: every model with dataset version, training date, metrics'
+        ]
+      },
+      {
+        id: 'w16', label: 'Week 16', title: 'Production Monitoring',
+        tasks: [
+          'Set up: Evidently AI for data drift detection',
+          'Implement: confidence calibration monitoring on prediction logs',
+          'Build: alert rule if sensitivity drops below threshold',
+          'Write: automated retraining trigger DAG in Airflow',
+          'Read: "Hidden Technical Debt in ML Systems" (Sculley 2015)'
+        ]
+      }
+    ],
+    deliverable: {
+      icon: '🔄',
+      title: 'ML Platform Core',
+      desc: 'Airflow DAGs: ingest DICOM → validate → extract features → trigger training. MLflow tracks all experiments. DVC versions datasets. Evidently monitors predictions.'
+    }
+  },
+  {
+    id: 5,
+    color: '#e879a0',
+    label: 'Month 5',
+    name: 'Frontend & Cloud Infrastructure',
+    sub: 'React/TypeScript clinical dashboard + Azure AKS deployment',
+    goal: '<strong>Build the interface a radiologist would actually use.</strong> Deploy everything to Azure with proper security, scaling, and observability. This is where it starts looking like a real product.',
+    weeks: [
+      {
+        id: 'w17', label: 'Week 17', title: 'React + TypeScript Frontend',
+        tasks: [
+          'Scaffold: Vite + React 18 + TypeScript strict mode project',
+          'Set up: TailwindCSS + shadcn/ui component system',
+          'Integrate: TanStack Query for async data fetching from FastAPI',
+          'Add: Cornerstone3D DICOM viewer with basic window/level controls',
+          'Implement: JWT auth flow (login → token storage → protected routes)'
+        ]
+      },
+      {
+        id: 'w18', label: 'Week 18', title: 'Clinical Dashboard',
+        tasks: [
+          'Build: patient worklist table with study status filters',
+          'Build: study view — DICOM viewer + AI prediction overlay panel',
+          'Build: GradCAM heatmap toggle on top of mammogram',
+          'Build: report generation form (findings, BI-RADS score, notes)',
+          'Add: role-based UI (radiologist sees different view than admin)'
+        ]
+      },
+      {
+        id: 'w19', label: 'Week 19', title: 'Azure Cloud Architecture',
+        tasks: [
+          'Set up: Azure account + AKS cluster (free tier)',
+          'Push: Docker images to Azure Container Registry',
+          'Deploy: FastAPI + PostgreSQL + Redis to AKS via kubectl',
+          'Set up: Azure Blob Storage for DICOM files and model artifacts',
+          'Configure: Azure Monitor + Application Insights'
+        ]
+      },
+      {
+        id: 'w20', label: 'Week 20', title: 'Infrastructure as Code',
+        tasks: [
+          'Write: Terraform configs for AKS, ACR, Storage, PostgreSQL',
+          'Write: Helm chart for the full application stack',
+          'Add: GitHub Actions → build → push → helm upgrade pipeline',
+          'Set up: Let\'s Encrypt TLS via cert-manager',
+          'Test: zero-downtime rolling deployment'
+        ]
+      }
+    ],
+    deliverable: {
+      icon: '🖥️',
+      title: 'Clinical Dashboard + Cloud Deployment',
+      desc: 'React frontend with DICOM viewer, AI overlay, and reporting. Deployed to Azure AKS via GitHub Actions. All services live with monitoring and TLS.'
+    }
+  },
+  {
+    id: 6,
+    color: '#ff6b6b',
+    label: 'Month 6',
+    name: 'Capstone — Full-Stack Breast Cancer AI Platform',
+    sub: 'Multi-modal AI + EHR integration + launch-ready portfolio project',
+    goal: '<strong>Ship something a hospital could pilot.</strong> Integrate all modalities, harden the system, write the docs, record the demo. This is your founding artifact — treat it like a product launch.',
+    weeks: [
+      {
+        id: 'w21', label: 'Week 21', title: 'Multi-Modal AI Integration',
+        tasks: [
+          'Build: feature fusion from mammography + ultrasound + clinical EHR data',
+          'Implement: FHIR API client to pull patient history',
+          'Build: late fusion ensemble (image CNN + tabular MLP)',
+          'Implement: Optuna hyperparameter optimization for ensemble weights',
+          'Evaluate: does multi-modal outperform single-modal? Document findings'
+        ]
+      },
+      {
+        id: 'w22', label: 'Week 22', title: 'Advanced AI Features',
+        tasks: [
+          'Implement: Monte Carlo Dropout for uncertainty quantification',
+          'Display: prediction confidence intervals in dashboard',
+          'Build: risk stratification score (low/moderate/high) with clinical thresholds',
+          'Implement: comparative study view (current vs prior exam)',
+          'Add: batch inference endpoint for screening workflows'
+        ]
+      },
+      {
+        id: 'w23', label: 'Week 23', title: 'Platform Hardening',
+        tasks: [
+          'Write: end-to-end integration tests (Playwright for frontend)',
+          'Run: load test with Locust — 20 concurrent users, 50 inferences/min',
+          'Audit: OWASP top 10 checklist, fix any issues',
+          'Write: DICOM conformance statement (what SOP classes you support)',
+          'Fix: all critical bugs found, document known limitations'
+        ]
+      },
+      {
+        id: 'w24', label: 'Week 24', title: 'Portfolio Launch',
+        tasks: [
+          'Draw: C4 architecture diagram (Context, Container, Component)',
+          'Write: comprehensive README with architecture, setup, and demo GIF',
+          'Record: 5-minute screen walkthrough demo video',
+          'Write: technical blog post — key design decisions and lessons learned',
+          'Share: GitHub repo, LinkedIn post, medical AI communities'
+        ]
+      }
+    ],
+    deliverable: {
+      icon: '🏥',
+      title: 'Full-Stack Breast Cancer AI Platform',
+      desc: 'Multi-modal AI: DICOM ingestion → segmentation + classification → EHR-integrated risk scoring → clinical dashboard → XAI → deployed on Azure with full MLOps. Your flagship portfolio piece.'
+    }
+  }
+];
+
+// ── State management ──
+function loadState() {
+  try { return JSON.parse(localStorage.getItem('medai_tracker') || '{}'); } catch { return {}; }
+}
+function saveState(state) {
+  state._updated = new Date().toISOString();
+  localStorage.setItem('medai_tracker', JSON.stringify(state));
+}
+
+let state = loadState();
+
+// ── Rendering ──
+function getWeekKey(phaseId, weekId) { return `p${phaseId}_${weekId}`; }
+function getTaskKey(phaseId, weekId, taskIdx) { return `p${phaseId}_${weekId}_t${taskIdx}`; }
+function getNoteKey(phaseId) { return `p${phaseId}_notes`; }
+
+function countPhaseTasks(phase) {
+  let total = 0, done = 0;
+  phase.weeks.forEach(w => {
+    w.tasks.forEach((_, i) => {
+      total++;
+      if (state[getTaskKey(phase.id, w.id, i)]) done++;
+    });
+  });
+  return { total, done };
+}
+
+function countAll() {
+  let total = 0, done = 0;
+  PHASES.forEach(p => {
+    const c = countPhaseTasks(p);
+    total += c.total;
+    done += c.done;
+  });
+  return { total, done };
+}
+
+function getWeeksStarted() {
+  const started = new Set();
+  Object.keys(state).forEach(k => {
+    if (k.startsWith('p') && k.includes('_t') && state[k]) {
+      const parts = k.split('_');
+      started.add(parts[0] + '_' + parts[1]);
+    }
+  });
+  return started.size;
+}
+
+function getCurrentPhase() {
+  for (let i = PHASES.length - 1; i >= 0; i--) {
+    const { done } = countPhaseTasks(PHASES[i]);
+    if (done > 0) return PHASES[i];
+  }
+  return PHASES[0];
+}
+
+function updateStats() {
+  const { total, done } = countAll();
+  const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+  document.getElementById('overall-fill').style.width = pct + '%';
+  document.getElementById('overall-pct').textContent = pct + '%';
+  document.getElementById('stat-done').innerHTML = `${done} <span>/ ${total}</span>`;
+  document.getElementById('stat-weeks').innerHTML = `${getWeeksStarted()} <span>/ 24</span>`;
+  const cp = getCurrentPhase();
+  document.getElementById('stat-phase').innerHTML = `${cp.id} <span>${cp.label}</span>`;
+  const upd = state._updated;
+  if (upd) {
+    const d = new Date(upd);
+    document.getElementById('stat-date').textContent = d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+  }
+}
+
+function updatePhaseUI(phase) {
+  const { total, done } = countPhaseTasks(phase);
+  const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+  const fillEl = document.getElementById(`pf-${phase.id}`);
+  const pctEl = document.getElementById(`pp-${phase.id}`);
+  if (fillEl) fillEl.style.width = pct + '%';
+  if (pctEl) pctEl.textContent = pct + '%';
+  const card = document.getElementById(`phase-${phase.id}`);
+  if (card) card.classList.toggle('active', done > 0);
+}
+
+function toggleTask(phaseId, weekId, taskIdx) {
+  const key = getTaskKey(phaseId, weekId, taskIdx);
+  state[key] = !state[key];
+  saveState(state);
+  const check = document.getElementById(`chk-${key}`);
+  const text = document.getElementById(`txt-${key}`);
+  if (check) check.classList.toggle('checked', !!state[key]);
+  if (text) text.classList.toggle('done', !!state[key]);
+  const phase = PHASES.find(p => p.id === phaseId);
+  if (phase) updatePhaseUI(phase);
+  updateStats();
+}
+
+function saveNote(phaseId, val) {
+  state[getNoteKey(phaseId)] = val;
+  saveState(state);
+}
+
+function togglePhase(phaseId) {
+  const body = document.getElementById(`pb-${phaseId}`);
+  const chev = document.getElementById(`pc-${phaseId}`);
+  const isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  chev.classList.toggle('open', !isOpen);
+}
+
+function renderPhase(phase) {
+  const { total, done } = countPhaseTasks(phase);
+  const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+  const isStarted = done > 0;
+
+  const weeksHtml = phase.weeks.map(w => {
+    const wDone = w.tasks.filter((_, i) => state[getTaskKey(phase.id, w.id, i)]).length;
+    const wPct = Math.round((wDone / w.tasks.length) * 100);
+    const statusColor = wPct === 100 ? 'color:var(--green)' : wPct > 0 ? 'color:var(--amber)' : 'color:var(--muted)';
+    const statusText = wPct === 100 ? '✓ done' : wPct > 0 ? `${wPct}%` : 'not started';
+
+    const tasksHtml = w.tasks.map((task, i) => {
+      const key = getTaskKey(phase.id, w.id, i);
+      const checked = !!state[key];
+      return `
+      <div class="task" onclick="toggleTask(${phase.id}, '${w.id}', ${i})">
+        <div class="task-check ${checked ? 'checked' : ''}" id="chk-${key}"></div>
+        <div class="task-text ${checked ? 'done' : ''}" id="txt-${key}">${task}</div>
+      </div>`;
+    }).join('');
+
+    return `
+    <div class="week">
+      <div class="week-header">
+        <div class="week-label">${w.label}</div>
+        <div class="week-status" style="${statusColor};background:var(--bg);border:1px solid var(--border)">${statusText}</div>
+      </div>
+      <div class="week-title">${w.title}</div>
+      ${tasksHtml}
+    </div>`;
+  }).join('');
+
+  const noteVal = state[getNoteKey(phase.id)] || '';
+  const delivColor = phase.color;
+
+  return `
+  <div class="phase ${isStarted ? 'active' : ''}" id="phase-${phase.id}">
+    <div class="phase-header" onclick="togglePhase(${phase.id})">
+      <div class="phase-dot" style="color:${delivColor};border-color:${delivColor};background:${delivColor}18">
+        ${phase.id}
+      </div>
+      <div class="phase-meta">
+        <div class="phase-name">
+          <span style="color:var(--muted);font-weight:400;font-size:12px">${phase.label}</span>
+          ${phase.name}
+        </div>
+        <div class="phase-sub">${phase.sub}</div>
+      </div>
+      <div class="phase-progress-wrap">
+        <div class="phase-bar">
+          <div class="phase-fill" id="pf-${phase.id}" style="width:${pct}%;background:${delivColor}"></div>
+        </div>
+        <div class="phase-pct" id="pp-${phase.id}">${pct}%</div>
+      </div>
+      <div class="phase-toggle" id="pc-${phase.id}">▾</div>
+    </div>
+    <div class="phase-body" id="pb-${phase.id}">
+      <div class="month-goal" style="border-color:${delivColor}">${phase.goal}</div>
+      <div class="weeks">${weeksHtml}</div>
+      <div class="deliverable" style="background:${delivColor}0d;border-color:${delivColor}40">
+        <div class="deliverable-icon">${phase.deliverable.icon}</div>
+        <div>
+          <div class="deliverable-title" style="color:${delivColor}">Monthly deliverable — ${phase.deliverable.title}</div>
+          <div class="deliverable-desc">${phase.deliverable.desc}</div>
+        </div>
+      </div>
+      <div class="notes-section">
+        <div class="notes-label">Your notes for ${phase.label}</div>
+        <textarea class="notes-input" placeholder="What worked? What was hard? Links to your repos, papers you read, decisions you made…" onchange="saveNote(${phase.id}, this.value)">${noteVal}</textarea>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ── Init ──
+document.getElementById('phases-container').innerHTML = PHASES.map(renderPhase).join('');
+updateStats();
+
+// Open current active phase
+const cp = getCurrentPhase();
+togglePhase(cp.id);
+</script>
+</body>
+</html>
